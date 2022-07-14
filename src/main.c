@@ -9,7 +9,7 @@ vec3_t cube_points[N_POINTS];
 vec2_t projected_points[N_POINTS];
 
 vec3_t camera_position = { .x = 0, .y = 0, .z = -5 };
-vec3_t cube_rotation = { .x =0, .y = 0, .z = 0 };
+vec3_t cube_rotation = { .x = 0, .y = 0, .z = 0 };
 float fov_factor = 640;
 
 bool is_running = false;
@@ -66,14 +66,15 @@ vec2_t project(vec3_t point)
 {
   vec2_t projected = {
       .x = (fov_factor * point.x) / point.z,
-      .y = (fov_factor * point.y) / point.z};
+      .y = (fov_factor * point.y) / point.z
+    };
 
   return projected;
 }
 
 void update(void)
 {
-  int time_to_wait = FRAME_TARGET_TIME - (SDL_GetTicks() + previous_frame_time);
+  int time_to_wait = FRAME_TARGET_TIME - (SDL_GetTicks() - previous_frame_time);
 
   if (time_to_wait > 0 && time_to_wait <= FRAME_TARGET_TIME){
     SDL_Delay(time_to_wait);
@@ -81,6 +82,7 @@ void update(void)
 
   previous_frame_time = SDL_GetTicks();
 
+  // Rotation in radians
   cube_rotation.z += 0.001;
   cube_rotation.y += 0.001;
   cube_rotation.z += 0.001;
@@ -89,13 +91,19 @@ void update(void)
   {
     vec3_t point = cube_points[i];
 
+    // Rotate each vector of cube by x,y and z
+    // NOTE: we pass the transformed point to each subsequent step - not a fresh point
     vec3_t transformed_point_x = vec3_rotate_x(point, cube_rotation.x);
     vec3_t transformed_point_xy = vec3_rotate_y(transformed_point_x, cube_rotation.y);
     vec3_t transformed_point_xyz = vec3_rotate_z(transformed_point_xy, cube_rotation.z);
-    // Simulate moving the camera back by subtracting 
+    // Simulate moving the camera back by subtracting
     // z-pos of camera from every point 
+    // NOTE: right-hand rule states that -ve z index goes into _into_
+    // the screen hence we subtract the camera position in order to push
+    // the point away
     transformed_point_xyz.z -= camera_position.z;
 
+    //
     vec2_t projected = project(transformed_point_xyz);
 
     projected_points[i] = projected;
