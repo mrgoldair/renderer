@@ -3,10 +3,10 @@
 #include <stdbool.h>
 #include "display.h"
 #include "vector.h"
+#include "mesh.h"
+#include "triangle.h"
 
-const int N_POINTS = 9 * 9 * 9;
-vec3_t cube_points[N_POINTS];
-vec2_t projected_points[N_POINTS];
+triangle_t triangles_to_render[N_MESH_FACES];
 
 vec3_t camera_position = { .x = 0, .y = 0, .z = -5 };
 vec3_t cube_rotation = { .x = 0, .y = 0, .z = 0 };
@@ -27,22 +27,6 @@ void setup(void)
       SDL_TEXTUREACCESS_STREAMING,
       window_width,
       window_height);
-
-  int point_count = 0;
-  for (float x = -1; x <= 1; x += 0.25)
-  {
-    for (float y = -1; y <= 1; y += 0.25)
-    {
-      for (float z = -1; z <= 1; z += 0.25)
-      {
-        vec3_t new_point = {x,
-                            y,
-                            z};
-
-        cube_points[point_count++] = new_point;
-      }
-    }
-  }
 }
 
 void process_input(void)
@@ -87,41 +71,53 @@ void update(void)
   cube_rotation.y += 0.001;
   cube_rotation.z += 0.001;
 
-  for (int i = 0; i < N_POINTS; i++)
-  {
-    vec3_t point = cube_points[i];
+  for (int i = 0; i < N_MESH_FACES; i++){
+    face_t mesh_face = mesh_faces[i];
+    
+    vec3_t face_vertices[3];
+    // Perform lookup – mesh_face stores an _index_ of a vertex within mesh_vertices
+    // .a - 1 because the faces are not 0th indexed
+    face_vertices[0] = mesh_vertices[mesh_face.a - 1];
+    face_vertices[1] = mesh_vertices[mesh_face.b - 1];
+    face_vertices[2] = mesh_vertices[mesh_face.c - 1];
 
-    // Rotate each vector of cube by x,y and z
-    // NOTE: we pass the transformed point to each subsequent step - not a fresh point
-    vec3_t transformed_point_x = vec3_rotate_x(point, cube_rotation.x);
-    vec3_t transformed_point_xy = vec3_rotate_y(transformed_point_x, cube_rotation.y);
-    vec3_t transformed_point_xyz = vec3_rotate_z(transformed_point_xy, cube_rotation.z);
-    // Simulate moving the camera back by subtracting
-    // z-pos of camera from every point 
-    // NOTE: right-hand rule states that -ve z index goes into _into_
-    // the screen hence we subtract the camera position in order to push
-    // the point away
-    transformed_point_xyz.z -= camera_position.z;
+    triangle_t projected_triangle;
 
-    //
-    vec2_t projected = project(transformed_point_xyz);
+    // Transform and project each face's vertex
+    for (int j = 0; j < 3; j++){
+      vec3_t transformed_vertex = face_vertices[j];
+      // NOTE: Accumulate the transformation across all 3 axis
+      transformed_vertex = vec3_rotate_x(transformed_vertex, cube_rotation.x);
+      transformed_vertex = vec3_rotate_y(transformed_vertex, cube_rotation.y);
+      transformed_vertex = vec3_rotate_z(transformed_vertex, cube_rotation.z);
+      // Simulate moving the camera back by subtracting z-pos of camera from every point 
+      // NOTE: right-hand rule states that -ve z index goes into _into_
+      // the screen hence we subtract the camera position in order to push the point away
+      transformed_vertex.z -= camera_position.z;
 
-    projected_points[i] = projected;
+      // A projected vertex is a point
+      vec2_t projected_point = project(transformed_vertex);
+      
+      projected_point.x += (window_width / 2);
+      projected_point.y += (window_height / 2);
+      // When all points of a face are transformed and projected we have a triangle ready to render
+      projected_triangle.points[j] = projected_point;
+    }
+
+    // Add projected triangle to list of triangles ready to render
+    triangles_to_render[i] = projected_triangle;
   }
 }
 
 void render(void)
 {
-  // Loop all projected and render
-  for (int i = 0; i < N_POINTS; i++)
+  // // Loop all projected and render
+  for (int i = 0; i < N_MESH_FACES; i++)
   {
-    vec2_t projected_point = projected_points[i];
-    draw_rect(
-        projected_point.x + (window_width / 2),
-        projected_point.y + (window_height / 2),
-        4,
-        4,
-        0xFFFFFF00);
+    triangle_t triangle = triangles_to_render[i];
+    draw_rect(triangle.points[0].x, triangle.points[0].y, 3, 3, 0xFFFFFF00);
+    draw_rect(triangle.points[1].x, triangle.points[1].y, 3, 3, 0xFFFFFF00);
+    draw_rect(triangle.points[2].x, triangle.points[2].y, 3, 3, 0xFFFFFF00);
   }
 
   // colour buffer -> texture
