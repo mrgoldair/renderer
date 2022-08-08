@@ -16,11 +16,15 @@ extern int window_width;
 extern int window_height;
 
 bool initialize_window(void);
+
 void draw_pixel(int x, int y, u_int32_t colour);
-void draw_grid(void);
+void draw_line(int x0, int y0, int x1, int y1, u_int32_t colour);
 void draw_rect(int x, int y, int width, int height, u_int32_t colour);
-void clear_colour_buffer(u_int32_t colour);
+void draw_triangle(int x0, int y0, int x1, int y1, int x2, int y2, u_int32_t colour);
+void draw_grid(void);
+
 void render_colour_buffer(void);
+void clear_colour_buffer(u_int32_t colour);
 void destroy_window(void);
 
 #endif

@@ -100,6 +100,38 @@ void draw_rect(int x, int y, int width, int height, u_int32_t colour)
   }
 }
 
+void draw_line(int x0, int y0, int x1, int y1, uint32_t color)
+{
+  // Calculate delta of each dimension
+  int delta_x = (x1 - x0);
+  int delta_y = (y1 - y0);
+
+  int longest_side = (abs(delta_x) >= abs(delta_y)) ? abs(delta_x) : abs(delta_y);
+
+  // The largest dimension simply increments by 1 but this
+  // could obviously be x or y. Dividing either delta by `longest_side`
+  // will yield one of the variables as 1 with the other some fraction
+  float inc_x = delta_x / (float)longest_side;
+  float inc_y = delta_y / (float)longest_side;
+  
+  float current_x = x0;
+  float current_y = y0;
+
+  for (int step = 0; step < longest_side; step++)
+  {
+    draw_pixel(round(current_x), round(current_y), color);
+    current_x += inc_x;
+    current_y += inc_y;
+  }
+}
+
+void draw_triangle(int x0, int y0, int x1, int y1, int x2, int y2, u_int32_t colour)
+{
+  draw_line(x0, y0, x1, y1, 0xFFFFFF00);
+  draw_line(x1, y1, x2, y2, 0xFFFFFF00);
+  draw_line(x2, y2, x0, y0, 0xFFFFFF00);
+}
+
 void clear_colour_buffer(u_int32_t colour)
 {
   for (int y = 0; y < window_height; y++)
