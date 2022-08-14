@@ -10,7 +10,6 @@
 triangle_t* triangles_to_render = NULL;
 
 vec3_t camera_position = { .x = 0, .y = 0, .z = -5 };
-vec3_t cube_rotation = { .x = 0, .y = 0, .z = 0 };
 float fov_factor = 640;
 
 bool is_running = false;
@@ -28,6 +27,9 @@ void setup(void)
       SDL_TEXTUREACCESS_STREAMING,
       window_width,
       window_height);
+
+  // Load cube data into the mesh data structure
+  load_cube_mesh_data();
 }
 
 void process_input(void)
@@ -59,7 +61,7 @@ vec2_t project(vec3_t point)
 
 /**
  * @brief We keep track of the change in motion through
- * `cube_rotation.x/y/z` etc and these accumulated changes
+ * `mesh.rotation.x/y/z` etc and these accumulated changes
  * are applied to the "identity" mesh; the effective change
  * in mesh verts are never persisted frame-to-frame but the changes
  * are applied to the original mesh.
@@ -79,19 +81,21 @@ void update(void)
   triangles_to_render = NULL;
 
   // Rotation in radians
-  cube_rotation.z += 0.001;
-  cube_rotation.y += 0.001;
-  cube_rotation.z += 0.001;
+  mesh.rotation.z += 0.001;
+  mesh.rotation.y += 0.001;
+  mesh.rotation.z += 0.001;
 
-  for (int i = 0; i < N_MESH_FACES; i++){
-    face_t mesh_face = mesh_faces[i];
+  int num_mesh_faces = array_length(mesh.faces);
+
+  for (int i = 0; i < num_mesh_faces; i++){
+    face_t mesh_face = mesh.faces[i];
     
     vec3_t face_vertices[3];
     // Perform lookup – mesh_face stores an _index_ of a vertex within mesh_vertices
     // .a - 1 because the faces are not 0th indexed
-    face_vertices[0] = mesh_vertices[mesh_face.a - 1];
-    face_vertices[1] = mesh_vertices[mesh_face.b - 1];
-    face_vertices[2] = mesh_vertices[mesh_face.c - 1];
+    face_vertices[0] = mesh.vertices[mesh_face.a - 1];
+    face_vertices[1] = mesh.vertices[mesh_face.b - 1];
+    face_vertices[2] = mesh.vertices[mesh_face.c - 1];
 
     triangle_t projected_triangle;
 
@@ -99,9 +103,9 @@ void update(void)
     for (int j = 0; j < 3; j++){
       vec3_t transformed_vertex = face_vertices[j];
       // NOTE: Accumulate the transformation across all 3 axis
-      transformed_vertex = vec3_rotate_x(transformed_vertex, cube_rotation.x);
-      transformed_vertex = vec3_rotate_y(transformed_vertex, cube_rotation.y);
-      transformed_vertex = vec3_rotate_z(transformed_vertex, cube_rotation.z);
+      transformed_vertex = vec3_rotate_x(transformed_vertex, mesh.rotation.x);
+      transformed_vertex = vec3_rotate_y(transformed_vertex, mesh.rotation.y);
+      transformed_vertex = vec3_rotate_z(transformed_vertex, mesh.rotation.z);
       // Simulate moving the camera back by subtracting z-pos of camera from every point 
       // NOTE: right-hand rule states that -ve z index goes into _into_
       // the screen hence we subtract the camera position in order to push the point away
@@ -146,12 +150,19 @@ void render(void)
   }
 
   array_free(triangles_to_render);
-  
+
   // colour buffer -> texture
   // texture -> renderer
   render_colour_buffer();
   clear_colour_buffer(0xFF000000);
   SDL_RenderPresent(renderer);
+}
+
+void free_resources(void)
+{
+  array_free(mesh.faces);
+  array_free(mesh.vertices);
+  free(colour_buffer);
 }
 
 int main(void)
@@ -169,6 +180,8 @@ int main(void)
   }
 
   destroy_window();
+
+  free_resources();
 
   return true;
 }

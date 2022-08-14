@@ -1,13 +1,25 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include "array.h"
 #include "vector.h"
 #include "triangle.h"
 
-#define N_MESH_VERTICES 8
-extern vec3_t mesh_vertices[N_MESH_VERTICES];
+#define N_CUBE_VERTICES 8
+#define N_CUBE_FACES (6 * 2)
+extern vec3_t cube_vertices[N_CUBE_VERTICES];
+extern face_t cube_faces[N_CUBE_FACES];
+void load_cube_mesh_data(void);
 
-#define N_MESH_FACES (6 * 2)
-extern face_t mesh_faces[N_MESH_FACES];
+/**
+ * @brief Defines a struct for dynamic sized meshes
+ */
+typedef struct {
+  vec3_t* vertices; // dynamic array of vertices
+  face_t* faces; // dynamic array of vertices
+  vec3_t rotation; // Current rotation of mesh in x,y and z
+} mesh_t;
+
+extern mesh_t mesh;
 
 #endif
