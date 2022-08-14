@@ -5,4 +5,4 @@ run:
 	./out/renderer
 
 clean:
-	rm -r out
+	rm -r out/*

@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "array.h"
 #include "display.h"
 #include "vector.h"
 #include "mesh.h"
 #include "triangle.h"
 
-triangle_t triangles_to_render[N_MESH_FACES];
+triangle_t* triangles_to_render = NULL;
 
 vec3_t camera_position = { .x = 0, .y = 0, .z = -5 };
 vec3_t cube_rotation = { .x = 0, .y = 0, .z = 0 };
@@ -56,6 +57,13 @@ vec2_t project(vec3_t point)
   return projected;
 }
 
+/**
+ * @brief We keep track of the change in motion through
+ * `cube_rotation.x/y/z` etc and these accumulated changes
+ * are applied to the "identity" mesh; the effective change
+ * in mesh verts are never persisted frame-to-frame but the changes
+ * are applied to the original mesh.
+ */
 void update(void)
 {
   //
@@ -66,6 +74,9 @@ void update(void)
   }
 
   previous_frame_time = SDL_GetTicks();
+
+  // Every frame init the triangles to render
+  triangles_to_render = NULL;
 
   // Rotation in radians
   cube_rotation.z += 0.001;
@@ -106,14 +117,18 @@ void update(void)
     }
 
     // Add projected triangle to list of triangles ready to render
-    triangles_to_render[i] = projected_triangle;
+    array_push(triangles_to_render, projected_triangle);
   }
 }
 
 void render(void)
 {
+  draw_grid();
+
+  int num_mesh_triangles = array_length(triangles_to_render);
+
   // // Loop all projected and render
-  for (int i = 0; i < N_MESH_FACES; i++)
+  for (int i = 0; i < num_mesh_triangles; i++)
   {
     triangle_t triangle = triangles_to_render[i];
     draw_rect(triangle.points[0].x, triangle.points[0].y, 3, 3, 0xFFFFFF00);
@@ -130,6 +145,8 @@ void render(void)
       0xFFFFFF00);
   }
 
+  array_free(triangles_to_render);
+  
   // colour buffer -> texture
   // texture -> renderer
   render_colour_buffer();
