@@ -22,14 +22,14 @@ void setup(void)
 
   // Creating SDL texture that is used to display
   colour_buffer_texture = SDL_CreateTexture(
-      renderer,
-      SDL_PIXELFORMAT_ARGB8888,
-      SDL_TEXTUREACCESS_STREAMING,
-      window_width,
-      window_height);
+    renderer,
+    SDL_PIXELFORMAT_ARGB8888,
+    SDL_TEXTUREACCESS_STREAMING,
+    window_width,
+    window_height);
 
   // Load cube data into the mesh data structure
-  load_cube_mesh_data();
+  load_obj_file_data("assets/cube.obj");
 }
 
 void process_input(void)
@@ -167,7 +167,6 @@ void free_resources(void)
 
 int main(void)
 {
-
   is_running = initialize_window();
 
   setup();
