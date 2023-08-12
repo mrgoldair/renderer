@@ -30,3 +30,109 @@ vec3_t vec3_rotate_z(vec3_t v, float angle)
   };
   return rotated_vector;
 }
+
+float vec2_length(vec2_t v)
+{
+  return sqrt(v.x * v.x + v.y * v.y);
+}
+
+float vec3_length(vec3_t v)
+{
+  return sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+float vec2_dot(vec2_t a, vec2_t b)
+{
+  return a.x * b.x + a.y * b.y;
+}
+
+float vec3_dot(vec3_t a, vec3_t b)
+{
+  return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+vec3_t vec3_cross(vec3_t a, vec3_t b)
+{
+  vec3_t cross = {
+    .x = a.y * b.z - a.z * b.y,
+    .y = a.z * b.x - a.x * b.z,
+    .z = a.x * b.y - a.y * b.x
+  };
+  return cross;
+}
+
+vec2_t vec2_add(vec2_t a, vec2_t b)
+{
+  vec2_t added_vector = {
+    .x = a.x + b.x,
+    .y = b.y + a.y
+  };
+  return added_vector;
+}
+
+vec3_t vec3_add(vec3_t a, vec3_t b)
+{
+  vec3_t added_vector = {
+    .x = a.x + b.x,
+    .y = a.y + b.y,
+    .z = a.z + b.z
+  };
+  return added_vector;
+}
+
+vec2_t vec2_sub(vec2_t a, vec2_t b)
+{
+  vec2_t subbed_vector = {
+    .x = a.x - b.x,
+    .y = b.y - a.y
+  };
+  return subbed_vector;
+}
+
+vec3_t vec3_sub(vec3_t a, vec3_t b)
+{
+  vec3_t subbed_vector = {
+    .x = a.x - b.x,
+    .y = a.y - b.y,
+    .z = a.z - b.z
+  };
+  return subbed_vector;
+}
+
+vec2_t vec2_mul(vec2_t a, float factor)
+{
+  vec2_t scaled_vector = {
+    .x = a.x * factor,
+    .y = a.y * factor
+  };
+  return scaled_vector;
+}
+
+vec3_t vec3_mul(vec3_t a, float factor)
+{
+  vec3_t scaled_vector = {
+    .x = a.x * factor,
+    .y = a.y * factor,
+    .z = a.z * factor
+  };
+  return scaled_vector;
+}
+
+vec2_t vec2_div(vec2_t a, float factor)
+{
+  vec2_t scaled_vector = {
+    .x = a.x / factor,
+    .y = a.y / factor
+  };
+  return scaled_vector;
+}
+
+vec3_t vec3_div(vec3_t a, float factor)
+{
+  vec3_t scaled_vector = {
+    .x = a.x / factor,
+    .y = a.y / factor,
+    .z = a.z / factor
+  };
+  return scaled_vector;
+}

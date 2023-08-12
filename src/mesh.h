@@ -14,6 +14,7 @@ void load_obj_file_data(char* filename);
 
 /**
  * @brief Defines a struct for dynamic sized meshes
+ * https://abstractexpr.com/2023/06/29/structures-in-c-from-basics-to-memory-alignment/
  */
 typedef struct {
   vec3_t* vertices; // dynamic array of vertices
