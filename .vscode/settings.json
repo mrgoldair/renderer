@@ -1,5 +1,5 @@
 {
-  "editor.fontFamily": "'Input Mono', 'Source Code Pro', 'JetBrains Mono', Menlo, Monaco, 'Courier New', monospace",
+  "editor.fontFamily": "CommitMono, 'Input Mono', 'Source Code Pro', 'JetBrains Mono', Menlo, Monaco, 'Courier New', monospace",
   "editor.tabSize": 2,
   "editor.fontSize": 13,
   "C_Cpp.errorSquiggles": "Disabled",
