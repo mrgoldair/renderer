@@ -149,18 +149,21 @@ void update(void) {
     // cube with it's normal pointing in the direction of the camera.
     float alignment = vec3_dot(camera_ray, face_normal);
 
+    // Camera ray and normal are orthogonal i.e. we can't see the face
+    // so to replicate we don't render it and continue to the next face
     if (alignment < 0) {
       continue;
     }
 
-    // PROJECTION :: Each face which have not been culled -> [ A, C ]
+    // PROJECTION :: Each face which has not been culled -> [ A, C ]
     for (int j = 0; j < 3; j++) {
       // A projected vertex is a point
       vec2_t projected_point = project(transformed_vertices[j]);
 
       // Coordinates of mesh vertices are in the range -1/1, which
       // without translation would obviously be -1/1 of the window – the top
-      // left.
+      // left. Transforming them like this puts the origin at the center of the
+      // screen - our raster coord system.
       projected_point.x += (window_width / 2);
       projected_point.y += (window_height / 2);
 
@@ -183,15 +186,17 @@ void render(void) {
   for (int i = 0; i < num_mesh_triangles; i++) {
     triangle_t triangle = triangles_to_render[i];
 
+    // Draw filled triangle
     draw_filled_triangle(triangle.points[0].x, triangle.points[0].y, // vertex A
                          triangle.points[1].x, triangle.points[1].y, // vertex B
                          triangle.points[2].x, triangle.points[2].y, // vertex C
-                         0xFFFFFF00);
+                         0xFFFFFFFF);
 
+    // Draw unfilled triangle
     draw_triangle(triangle.points[0].x, triangle.points[0].y, // vertex A
                   triangle.points[1].x, triangle.points[1].y, // vertex B
                   triangle.points[2].x, triangle.points[2].y, // vertex C
-                  0xFFFFFF00);
+                  0xFF000000);
   }
 
   array_free(triangles_to_render);
