@@ -10,7 +10,7 @@ void int_swap(int *a, int *b) {
 //       (x0,y0)
 //         /  \
 //        /    \        Fills a triangle from top, `x0,y0` to bottom
-//        `x1,y1`,`x2,y2`
+//    `x1,y1`,`x2,y2`
 //       /      \
 //      /________\
 //  (x1,y1)    (x2,y2)
@@ -75,6 +75,7 @@ void draw_filled_triangle(int x0, int y0, int x1, int y1, int x2, int y2,
   } else if (y0 == y1) {
     fill_flat_top_triangle(x0, y0, x1, y1, x2, y2, color);
   } else {
+
     // Mx, My
     //
     // x2 - x0    Mx - x0

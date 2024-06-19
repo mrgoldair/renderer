@@ -1,7 +1,7 @@
 {
   "editor.fontFamily": "CommitMono, 'Input Mono', 'Source Code Pro', 'JetBrains Mono', Menlo, Monaco, 'Courier New', monospace",
   "editor.tabSize": 2,
-  "editor.fontSize": 13,
+  "editor.fontSize": 14,
   "C_Cpp.errorSquiggles": "Disabled",
   "files.associations": {
     "vector.h": "c"
